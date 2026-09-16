@@ -9,14 +9,14 @@
 -PRODUCT_INSTALLER_SHORTNAME=Chromium Installer
 -COPYRIGHT=Copyright @LASTCHANGE_YEAR@ The Chromium Authors. All rights reserved.
 -MAC_BUNDLE_ID=org.chromium.Chromium
-+COMPANY_FULLNAME=The Helium Authors
-+COMPANY_SHORTNAME=The Helium Authors
-+PRODUCT_FULLNAME=Helium
-+PRODUCT_SHORTNAME=Helium
-+PRODUCT_INSTALLER_FULLNAME=Helium Installer
-+PRODUCT_INSTALLER_SHORTNAME=Helium Installer
-+COPYRIGHT=Copyright @LASTCHANGE_YEAR@ The Helium Authors. All rights reserved.
-+MAC_BUNDLE_ID=net.imput.helium
++COMPANY_FULLNAME=The Hydro Authors
++COMPANY_SHORTNAME=The Hydro Authors
++PRODUCT_FULLNAME=Hydro
++PRODUCT_SHORTNAME=Hydro
++PRODUCT_INSTALLER_FULLNAME=Hydro Installer
++PRODUCT_INSTALLER_SHORTNAME=Hydro Installer
++COPYRIGHT=Copyright @LASTCHANGE_YEAR@ The Hydro Authors. All rights reserved.
++MAC_BUNDLE_ID=net.imput.hydro
  MAC_CREATOR_CODE=Cr24
 -MAC_TEAM_ID=
 +MAC_TEAM_ID=S4Q33XPHB4
@@ -45,7 +45,7 @@
 -  NOTREACHED();
 -#endif
 -
-+  product_info->product_name = "Helium";
++  product_info->product_name = "Hydro";
    product_info->version = UpdaterVersion();
    product_info->channel =
        chrome::GetChannelName(chrome::WithExtendedStable(true));

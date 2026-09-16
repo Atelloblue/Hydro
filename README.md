@@ -27,7 +27,7 @@ The same releases can also be downloaded from source on GitHub:
 - [Latest Windows release](https://github.com/imputnet/helium-windows/releases/latest)
 
 ## Hydro repos
-All Helium packaging, tooling, services, and components are open source
+All Hydro packaging, tooling, services, and components are open source
 and published on GitHub.
 
 ### Platform packaging and tooling
@@ -35,7 +35,7 @@ and published on GitHub.
 - [Hydro for Linux](https://github.com/imputnet/helium-linux)
 - [Hydro for Windows](https://github.com/imputnet/helium-windows)
 
-### Web services and Helium components
+### Web services and Hydro components
 - [Hydro services](https://github.com/imputnet/helium-services)
 - [Hydro onboarding](https://github.com/imputnet/helium-onboarding)
 - [Hydro fork of uBlock Origin](https://github.com/imputnet/uBlock)
@@ -61,8 +61,11 @@ making it possible in the first place.
 
 ### ungoogled-chromium
 This repo is based on [ungoogled-chromium](https://github.com/ungoogled-software/ungoogled-chromium),
-but heavily modified for Hydro. Special thanks to everyone behind ungoogled-chromium,
+heavily modified for Hydro. Special thanks to everyone behind ungoogled-chromium,
 they made working with Chromium way easier.
+
+### Helium
+Hydro is based on and forked from [Helium](https://github.com/imputnet/helium-macos), an open-source privacy-focused Chromium browser created by the Helium authors and [imputnet](https://imput.net). Special thanks to the Helium team and contributors.
 
 ### Other Chromium browsers
 
@@ -73,13 +76,12 @@ Hydro includes some patches from other open source Chromium browsers:
 - [Bromite](https://github.com/bromite/bromite)
 - [Iridium Browser](https://iridiumbrowser.de/)
 - [Brave](https://github.com/brave/brave-core)
-- [Helium](https://github.com/imputnet/helium-macos)
 
 All patches are sorted by vendor in the [patches](patches/) directory of this repo.
 
 ## License
 All code, patches, modified portions of imported code or patches, and
-any other content that is unique to Helium and not imported from other
+any other content that is unique to Hydro and not imported from other
 repositories is licensed under GPL-3.0. See [LICENSE](LICENSE).
 
 Any content imported from other projects retains its original license (for

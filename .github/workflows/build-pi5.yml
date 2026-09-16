@@ -1,0 +1,130 @@
+name: Build Hydro for Raspberry Pi 5 (ARM64)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-pi5:
+    name: Build Pi 5 (ARM64 Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 2048
+          temp-reserve-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies & Tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            git python3 python3-pip python3-venv python3-virtualenv \
+            python-is-python3 ninja-build pkg-config build-essential \
+            libglib2.0-dev libdrm-dev gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
+            xz-utils curl bison flex gperf quilt
+
+      - name: Set up Depot Tools
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git "$GITHUB_WORKSPACE/depot_tools"
+          echo "$GITHUB_WORKSPACE/depot_tools" >> "$GITHUB_PATH"
+
+      - name: Fetch & Prepare Chromium Source
+        run: |
+          export PATH="$GITHUB_WORKSPACE/depot_tools:$PATH"
+          mkdir -p "$GITHUB_WORKSPACE/chromium"
+          cd "$GITHUB_WORKSPACE/chromium"
+          CHROMIUM_VERSION=$(cat "$GITHUB_WORKSPACE/chromium_version.txt")
+          echo "Fetching Chromium source..."
+          fetch --nohooks --no-history chromium
+          cd src
+          ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+          gclient runhooks
+
+      - name: Apply Hydro Branding & Patches
+        run: |
+          export PATH="$GITHUB_WORKSPACE/depot_tools:$PATH"
+          cd "$GITHUB_WORKSPACE/chromium/src"
+
+          echo "Applying Hydro branding patch..."
+          git apply --ignore-whitespace "$GITHUB_WORKSPACE/patches/helium/core/change-chromium-branding.patch" || true
+
+          echo "Applying Hydro name substitutions..."
+          python3 "$GITHUB_WORKSPACE/utils/name_substitution.py" --sub -t . || true
+
+      - name: Configure GN (Raspberry Pi 5 ARM64)
+        run: |
+          cd "$GITHUB_WORKSPACE/chromium/src"
+          mkdir -p out/Release-ARM64
+          cat << 'EOF' > out/Release-ARM64/args.gn
+target_os = "linux"
+target_cpu = "arm64"
+is_debug = false
+is_component_build = false
+is_official_build = false
+symbol_level = 0
+blink_symbol_level = 0
+v8_symbol_level = 0
+dcheck_always_on = false
+treat_warnings_as_errors = false
+chrome_pgo_phase = 0
+enable_nacl = false
+enable_widevine = true
+enable_google_now = false
+enable_hangout_services_extension = false
+enable_mdns = false
+enable_remoting = false
+enable_reporting = false
+enable_service_discovery = false
+use_official_google_api_keys = false
+google_api_key = "no"
+google_default_client_id = "no"
+google_default_client_secret = "no"
+use_vaapi = false
+use_pulseaudio = true
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+arm_arch = "armv8.2-a"
+arm_cpu = "cortex-a76"
+EOF
+          gn gen out/Release-ARM64
+
+      - name: Build Hydro
+        run: |
+          export PATH="$GITHUB_WORKSPACE/depot_tools:$PATH"
+          cd "$GITHUB_WORKSPACE/chromium/src"
+          ninja -C out/Release-ARM64 chrome chrome_sandbox
+
+      - name: Package Distributables
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cd "$GITHUB_WORKSPACE/chromium/src/out/Release-ARM64"
+          tar -cJf "$GITHUB_WORKSPACE/dist/hydro-pi5-arm64.tar.xz" \
+            chrome chrome_sandbox icudtl.dat v8_context_snapshot.bin \
+            resources.pak chrome_100_percent.pak chrome_200_percent.pak locales/
+
+      - name: Upload Hydro Release Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          name: "Hydro Browser Release ${{ github.ref_name || 'latest' }}"
+          tag_name: ${{ github.ref_name || 'latest-release' }}
+          files: dist/hydro-pi5-arm64.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

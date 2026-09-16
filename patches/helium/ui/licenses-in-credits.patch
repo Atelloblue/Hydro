@@ -10,7 +10,8 @@
 +Security Critical: no
 +
 +Description:
-+The browser. We assume that it has the same license as helium-onboarding,
++The Helium browser, the open-source project from which Hydro is forked.
++We assume that it has the same license as helium-onboarding,
 +which is released under the same license and is a direct component of Helium.
 +
 +Local Modifications:
